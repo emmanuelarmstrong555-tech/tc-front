@@ -31,17 +31,34 @@ export default function AddedStudentOTP() {
     setRegistering(true);
     setMsg("");
 
+     console.log("=== Attempting to register student ===");
+  console.log("Student name:", student.name);
+  console.log("Student tel:", student.tel);
+  console.log("Password:", password);
+  console.log("Payload:", {
+    tel: student.tel,
+    password: password,
+    confirmPassword: password,
+    password_confirmation: password,
+  });
+
     try {
-      await axios.post(`${API_BASE_URL}/api/students/register`, {
+      const response = await axios.post(`${API_BASE_URL}/api/students/register`, {
         tel: student.tel,
         password: password,
         confirmPassword: password,
-        password_confirmation: password,
+        // password_confirmation: password,
       });
+      console.log("✓ Registration successful:", response.data);
 
       setMsg(<span className="text-green-500">OTP sent to {student.name}</span>);
     } catch (err) {
       console.error("Registration error:", err);
+      console.error("=== Registration FAILED ===");
+    console.error("Status:", err.response?.status);
+    console.error("Error data:", err.response?.data);
+    console.error("Validation errors:", err.response?.data?.errors);
+    console.error("Message:", err.response?.data?.message);
       setMsg(<span className="text-red-500">Failed to send OTP. Please try again.</span>);
     } finally {
       setRegistering(false);
@@ -67,11 +84,18 @@ export default function AddedStudentOTP() {
         tel: s.email.replace(/[\s\-().]/g, ""),
         password: parsed.password,
       })));
+       console.log("Phone students loaded:", phoneStudents);
+    console.log("Cleaned tel values:", phoneStudents.map(s => s.email.replace(/[\s\-().]/g, "")));
 
       // Register first student immediately
-      if (phoneStudents.length > 0) {
-        registerStudent(0, phoneStudents[0], parsed.password);
-      }
+       if (phoneStudents.length > 0) {
+      const firstStudent = {
+        ...phoneStudents[0],
+        tel: phoneStudents[0].email.replace(/[\s\-().]/g, ""),
+        password: parsed.password,
+      };
+      registerStudent(0, firstStudent, parsed.password);
+    }
     } else {
       navigate("/register/guardian/addstudent");
     }
