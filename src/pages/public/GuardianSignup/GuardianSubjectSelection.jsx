@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import TC_logo from "../../../assets/images/tutorial_logo.png";
 import signup_img from "../../../assets/images/student_sign_up.jpg";
 import { dropdownTheme } from "../../../utils/dropdownTheme";
 import { 
   ChevronLeftIcon
-, CheckIcon, UserIcon, XMarkIcon
+, CheckIcon, UserIcon
 } from "@heroicons/react/24/outline";
 
 export default function GuardianSubjectSelection() {
@@ -322,51 +322,79 @@ export default function GuardianSubjectSelection() {
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-[#09314F77] backdrop-blur-[2px] flex items-center justify-center z-[100] p-6 animate-fadeIn">
-          <div className="bg-white w-full max-w-[560px] rounded-[24px] shadow-2xl p-10 md:p-12">
-            <h2 className="text-xl font-bold text-[#09314F] mb-8">Review</h2>
+          <div className="bg-white w-full max-w-[560px] md:max-w-[900px] rounded-[24px] shadow-2xl p-8 md:p-10 max-h-[80vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-[#09314F] mb-6">Review</h2>
 
+            {/* Students Sections */}
             <div className="space-y-8">
               {students.map((student, sIndex) => (
-                <div key={sIndex} className="space-y-6">
-                  {/* Student Identifier (only if multiple students) */}
-                  {students.length > 1 && (
-                    <div className="flex items-center gap-2 pb-2 mb-2 border-b border-gray-100">
-                      <UserIcon className="h-4 w-4 text-[#E83831]" />
-                      <span className="text-sm font-bold text-[#09314F]">{student.name}</span>
+                <div key={sIndex} className="space-y-4">
+                  {/* Student Header with Icon */}
+                  <div className="flex items-center gap-3 pb-4 border-b-2 border-gray-200">
+                    <div className="w-8 h-8 rounded-lg bg-[#09314F] text-white flex items-center justify-center flex-shrink-0">
+                      <UserIcon className="h-5 w-5" />
                     </div>
-                  )}
+                    <span className="text-sm font-bold text-[#09314F]">{student.name}</span>
+                  </div>
 
-                  <div className="grid grid-cols-[100px_1fr] gap-x-10 gap-y-0">
-                    {/* Headers */}
-                    <div className="text-[14px] font-bold text-[#09314F] mb-4">Courses</div>
-                    <div className="text-[14px] font-bold text-[#09314F] mb-4">Subjects</div>
+                  {/* Courses and Subjects Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    {/* Desktop Header Row */}
+                    <div className="hidden md:block col-span-2">
+                      <div className="grid grid-cols-2 gap-8 pb-4 border-b-2 border-gray-200">
+                        <div className="text-xs font-bold text-[#09314F] uppercase tracking-widest">Courses</div>
+                        <div className="text-xs font-bold text-[#09314F] uppercase tracking-widest">Subjects</div>
+                      </div>
+                    </div>
 
-                    {student.activeCourses.map((course, cIndex) => {
-                      const selectedSubjects = student.subjectsByCourse[course.id]
-                        ?.filter(sub => student.selectedSubjects[course.id]?.includes(sub.id))
-                        ?.map(sub => sub.name)
-                        ?.join(", ");
+                    {/* Desktop View - Horizontal */}
+                    <div className="hidden md:contents">
+                      {student.activeCourses.map((course) => {
+                        const selectedSubjects = student.subjectsByCourse[course.id]
+                          ?.filter(sub => student.selectedSubjects[course.id]?.includes(sub.id))
+                          ?.map(sub => sub.name)
+                          ?.join(", ");
 
-                      return (
-                        <React.Fragment key={course.id}>
-                          {cIndex > 0 && (
-                            <div className="col-span-2 border-t border-gray-100 my-4" />
-                          )}
-                          <div className="text-[13px] font-bold text-[#09314F] py-1 uppercase tracking-wide">
-                            {course.title}
+                        return (
+                          <React.Fragment key={course.id}>
+                            <div className="text-sm font-bold text-[#09314F] uppercase tracking-wide py-3 border-b border-gray-100">
+                              {course.title}
+                            </div>
+                            <div className="text-sm font-medium text-gray-600 py-3 border-b border-gray-100 leading-relaxed">
+                              {selectedSubjects}
+                            </div>
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+
+                    {/* Mobile View - Vertical Rectangles */}
+                    <div className="md:hidden col-span-1 space-y-3">
+                      {student.activeCourses.map((course) => {
+                        const selectedSubjects = student.subjectsByCourse[course.id]
+                          ?.filter(sub => student.selectedSubjects[course.id]?.includes(sub.id))
+                          ?.map(sub => sub.name)
+                          ?.join(", ");
+
+                        return (
+                          <div key={course.id} className="bg-gray-50 rounded-[16px] p-4 border border-gray-200">
+                            <div className="text-xs font-bold text-[#09314F] uppercase tracking-widest mb-2">
+                              {course.title}
+                            </div>
+                            <div className="text-sm font-medium text-gray-600 leading-relaxed">
+                              {selectedSubjects}
+                            </div>
                           </div>
-                          <div className="text-[13px] font-medium text-gray-500 py-1 leading-relaxed">
-                            {selectedSubjects}
-                          </div>
-                        </React.Fragment>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex gap-4 mt-12">
+            {/* Buttons */}
+            <div className="flex gap-4 mt-8">
               <button 
                 onClick={() => setShowConfirmModal(false)} 
                 className="flex-1 h-[54px] rounded-[14px] font-bold text-sm text-[#09314F] bg-white border-2 border-[#09314F] hover:bg-gray-50 transition-all active:scale-[0.98]"
