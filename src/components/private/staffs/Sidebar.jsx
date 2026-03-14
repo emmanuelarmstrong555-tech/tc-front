@@ -192,6 +192,8 @@ export default function StaffSidebar({ collapsed, setCollapsed, isOpen, onClose 
             onClick={() => {
               localStorage.removeItem("staff_token");
               localStorage.removeItem("staff_info");
+              localStorage.removeItem("staff_role");
+              
               window.location.href = "/staff/login";
             }}
             className="flex items-center justify-center gap-2 text-red-500 hover:text-red-600"
