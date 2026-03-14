@@ -1,45 +1,76 @@
+import React from "react";
 import {
-  HomeIcon,
-  BookOpenIcon,
-  AcademicCapIcon,
-  ClipboardDocumentCheckIcon,
-  CalendarDaysIcon,
-  ChartBarIcon,
-  CreditCardIcon,
-  Cog6ToothIcon,
-  QuestionMarkCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon,
-  PuzzlePieceIcon,
 } from "@heroicons/react/24/outline";
 
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
-import logo from "../../assets/images/tutorial_logo.png";
-import collapselogo from "../../assets/images/TC 1.png";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useAuth } from "../../../context/AuthContext";
+import { useTheme } from "../../../context/ThemeContext";
+import logo from "../../../assets/images/tutorial_logo.png";
+import collapselogo from "../../../assets/images/TC 1.png";
 
 const menuItems = [
-  { label: "Dashboard", icon: HomeIcon, destination: "/student/dashboard" },
-  { label: "Courses", icon: BookOpenIcon },
-  { label: "Master Class", icon: AcademicCapIcon },
-  { label: "Exam Practice", icon: ClipboardDocumentCheckIcon },
-  { label: "Calendar", icon: CalendarDaysIcon, destination: "/student/calendar" },
-  { label: "Assessment", icon: ChartBarIcon },
-  { label: "Payment", icon: CreditCardIcon },
-  { label: "Games", icon: PuzzlePieceIcon },
-  { label: "Settings", icon: Cog6ToothIcon },
-  { label: "Help", icon: QuestionMarkCircleIcon },
+  {
+    label: "Dashboard",
+    icon: "mynaui:home-solid",
+    destination: "/student/dashboard",
+  },
+  {
+    label: "Courses",
+    icon: "mdi:book-open-page-variant",
+    destination: "/student/courses",
+  },
+  {
+    label: "Master Class",
+    icon: "healthicons:i-training-class",
+    destination: "/student/master-class",
+  },
+  {
+    label: "Exam Practice",
+    icon: "mdi:clipboard-text-outline",
+    destination: "/student/exam-practice",
+  },
+  {
+    label: "Calendar",
+    icon: "mdi:calendar-month",
+    destination: "/student/calendar",
+  },
+  {
+    label: "Assessment",
+    icon: "mdi:file-document-edit-outline",
+    destination: "/student/assessment",
+  },
+  {
+    label: "Games & Fun",
+    icon: "mdi:controller-classic",
+    destination: "/student/games",
+  },
+  {
+    label: "Payment",
+    icon: "mdi:credit-card-outline",
+    destination: "/student/payment-history", // This makes it clickable!
+  },
+  {
+    label: "Settings",
+    icon: "mdi:cog-outline",
+    destination: "/student/settings",
+  },
+  {
+    label: "Help",
+    icon: "mdi:help-circle-outline",
+    destination: "/student/help",
+  },
 ];
 
 export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
   const { theme, setTheme } = useTheme();
   const { student, logout } = useAuth();
-  const API_BASE_URL =
-    process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
 
   const fullName =
     student?.firstname && student?.surname
@@ -68,12 +99,12 @@ export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
         `}
       >
         {/* Logo */}
-        <div className="relative flex items-center justify-center p-4">
+        <div className="relative flex items-center justify-center p-6 mt-2 mb-2">
           <img
             src={collapsed ? collapselogo : logo}
             alt="TC Logo"
-            className={`transition-all duration-300 ${
-              collapsed ? "w-10" : "w-full"
+            className={`transition-all duration-300 object-contain ${
+              collapsed ? "w-10 h-10" : "w-40 h-auto"
             }`}
           />
 
@@ -88,7 +119,7 @@ export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
             className="
               absolute -right-3 top-1/2 -translate-y-1/2
               bg-blue-900 text-white
-              p-1.5 rounded-full shadow-lg hover:bg-blue-800
+              p-1.5 rounded-full shadow-lg hover:bg-blue-800 z-10
             "
           >
             {collapsed ? (
@@ -118,14 +149,14 @@ export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
 
         {/* Menu */}
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto mt-4">
-          {menuItems.map(({ label, icon: Icon, destination }) => {
+          {menuItems.map(({ label, icon, destination }) => {
             if (!destination) {
               return (
                 <div
                   key={label}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-gray-400 cursor-not-allowed"
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon icon={icon} className="w-5 h-5" />
                   {!collapsed && <span>{label}</span>}
                 </div>
               );
@@ -145,7 +176,7 @@ export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
                   }
                 `}
               >
-                <Icon className="w-5 h-5" />
+                <Icon icon={icon} className="w-5 h-5" />
                 {!collapsed && <span>{label}</span>}
               </NavLink>
             );
