@@ -99,7 +99,7 @@ export default function StudentClassSchedule() {
 
   return (
     <DashboardLayout pagetitle="Class Schedule">
-      <div className="p-6 space-y-8">
+      <div className="py-6 space-y-8">
         {/* =============================
           NEXT CLASS
       ============================= */}
