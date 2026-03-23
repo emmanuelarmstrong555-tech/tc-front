@@ -36,7 +36,12 @@ export default function StaffLogin() {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (countdown === 0) {
-      navigate("/staffs/manage-staffs");
+      const role = localStorage.getItem("staff_role");
+      if (role === "admin") {
+        navigate("/staffs/dashboard");
+      } else {
+        navigate("/staffs/tutor/dashboard");
+      }
     }
   }, [countdown, navigate]);
 
