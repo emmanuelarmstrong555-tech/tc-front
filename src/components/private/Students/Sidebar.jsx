@@ -74,10 +74,8 @@ export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
   const { student, logout } = useAuth();
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
 
-  const fullName =
-    student?.firstname && student?.surname
-      ? `${student.firstname} ${student.surname}`
-      : "Caleb Samuel Thomas";
+  const studentLoaded = student?.firstname && student?.surname;
+  const fullName = studentLoaded ? `${student.firstname} ${student.surname}` : null;
 
   return (
     <>
@@ -132,19 +130,30 @@ export default function Sidebar({ collapsed, setCollapsed, isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Avatar */}
+        {/* Avatar & Name */}
         <div className="flex px-3 space-y-2 flex-wrap gap-3 items-center">
-          <img
-            src={student?.profile_picture !== null ? `${API_BASE_URL}/storage/${student?.profile_picture}` : collapselogo}
-            alt="Avatar"
-            className="rounded-full shadow-lg h-10 w-10 object-cover border-2 border-yellow-400"
-          />
+          {studentLoaded ? (
+            <img
+              src={student?.profile_picture !== null ? `${API_BASE_URL}/storage/${student?.profile_picture}` : collapselogo}
+              alt="Avatar"
+              className="rounded-full shadow-lg h-10 w-10 object-cover border-2 border-yellow-400"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          )}
           {!collapsed && (
             <div>
-              <h6 className="text-yellow-400 text-sm">Hello Student</h6>
-              <h3 className="font-bold dark:text-gray-50 text-sm">
-                {fullName}
-              </h3>
+              {studentLoaded ? (
+                <>
+                  <h6 className="text-yellow-400 text-sm">Hello Student</h6>
+                  <h3 className="font-bold dark:text-gray-50 text-sm">{fullName}</h3>
+                </>
+              ) : (
+                <>
+                  <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse mb-2" />
+                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                </>
+              )}
             </div>
           )}
         </div>

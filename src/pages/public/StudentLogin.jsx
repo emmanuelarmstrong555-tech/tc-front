@@ -5,9 +5,11 @@ import login_img from "../../assets/images/login_img.jpg";
 import TC_logo from "../../assets/images/tutorial_logo.png";
 import ReturnArrow from "../../assets/svg/return arrow.svg";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "../../context/AuthContext";
 
 export default function StudentLogin() {
   const navigate = useNavigate(); // Initializing navigation
+  const { login } = useAuth();
   const [toast, setToast] = useState(null);
   const [errors, setErrors] = useState({}); // Initializing errors
   const [msg, setMsg] = useState({ text: "", type: "" });
@@ -60,8 +62,9 @@ export default function StudentLogin() {
       );
 
       if (response.status === 200) {
-        localStorage.setItem('student_info', JSON.stringify(response?.data?.student))
-        localStorage.setItem('student_token', response?.data?.token);
+        // Use AuthContext login to update both localStorage AND React state
+        login(response.data.token, response.data.student);
+
         setToast({ type: "success", message: response.data.message });
         setMsg({
           text: "Login successful!",

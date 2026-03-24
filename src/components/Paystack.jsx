@@ -61,9 +61,9 @@ const Paystack = ({
     <button
       onClick={pay}
       disabled={!paystackReady}
-      className="w-full py-3 rounded bg-gradient-to-r from-[#09314F] to-[#E83831] text-white font-semibold disabled:opacity-50"
+      className="w-full py-5 rounded-xl bg-[#0F2843] text-white font-black text-lg shadow-xl hover:shadow-[#0F284344] transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:shadow-none disabled:translate-y-0"
     >
-      {paystackReady ? "Pay with Paystack" : "Loading Payment Gateway..."}
+      {paystackReady ? "Pay with Paystack" : "Loading Gateway..."}
     </button>
   );
 };
