@@ -59,7 +59,15 @@ export const StudentTrainingPayment = () => {
 
   /* ================= PAYSTACK SUCCESS ================= */
   const handlePaystackSuccess = async (response) => {
-    if (!studentData) return;
+    // Robust email retrieval from localStorage
+    const storedData = JSON.parse(localStorage.getItem("studentdata"));
+    const storedInfo = JSON.parse(localStorage.getItem("student_info"));
+    const studentEmail = storedData?.data?.email || storedInfo?.email || storedInfo?.data?.email;
+
+    if (!studentEmail) {
+      alert("Student email not found. Please re-register or log in.");
+      return;
+    }
 
     setProcessing(true);
 
@@ -130,6 +138,7 @@ export const StudentTrainingPayment = () => {
             status: "successful",
             gateway_reference: paymentReference,
             paid_at: new Date().toISOString(),
+            email: studentEmail,
             meta: {
               channel: response.channel,
               paid_at: response.paid_at,

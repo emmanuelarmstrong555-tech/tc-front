@@ -1,9 +1,9 @@
-// components/private/Student/StudentPaymentRightBar.jsx
+// components/private/students/PaymentRenewal.jsx
 
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-export default function StudentPaymentRightBar({ onPaymentAdded }) {
+export default function PaymentRenewal({ onPaymentAdded }) {
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -160,8 +160,8 @@ export default function StudentPaymentRightBar({ onPaymentAdded }) {
             }`}
           >
             <option value="">Select Course</option>
-            {courses.map(course => (
-              <option key={course.id} value={course.id}>
+            {courses.map((course, index) => (
+              <option key={course.id || `course-${index}`} value={course.id}>
                 {course.title || course.name}
               </option>
             ))}
@@ -208,11 +208,11 @@ export default function StudentPaymentRightBar({ onPaymentAdded }) {
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#09314F] focus:border-transparent dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
             >
               <option value="">Select Subject</option>
-              {getAvailableSubjects().map(subj => (
+              {getAvailableSubjects().map((subj, sIndex) => (
                 <option 
-                  key={subj.id} 
+                  key={subj.id || `subj-${sIndex}`} 
                   value={subj.id}
-                  disabled={formData.subjects.includes(subj.id.toString()) && formData.subjects[index] !== subj.id.toString()}
+                  disabled={formData.subjects.includes(subj.id?.toString()) && formData.subjects[index] !== subj.id?.toString()}
                 >
                   {subj.name}
                 </option>

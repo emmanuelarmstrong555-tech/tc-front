@@ -10,10 +10,17 @@ export function AuthProvider({ children }) {
   // Load from localStorage on app start
   useEffect(() => {
     const storedToken = localStorage.getItem("student_token");
-    const storedStudent = localStorage.getItem("student_info");
+    const storedInfo = localStorage.getItem("student_info");
+    const storedData = localStorage.getItem("studentdata");
 
     if (storedToken) setToken(storedToken);
-    if (storedStudent) setStudent(JSON.parse(storedStudent));
+    
+    // Joint student profile retrieval
+    const info = storedInfo ? JSON.parse(storedInfo) : null;
+    const data = storedData ? JSON.parse(storedData) : null;
+    const jointStudent = info || data?.data || info?.data || null;
+
+    if (jointStudent) setStudent(jointStudent);
 
     setLoading(false);
   }, []);
@@ -51,6 +58,9 @@ export function AuthProvider({ children }) {
 
       setToken(null);
       setStudent(null);
+
+      // Redirect to student login
+      window.location.href = "/student/login";
     }
   };
 

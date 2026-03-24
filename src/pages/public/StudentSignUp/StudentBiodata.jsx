@@ -223,7 +223,7 @@ export default function StudentBiodata() {
       )}
 
       {/* LEFT SIDE: Content Area */}
-      <div className="w-full md:w-1/2 h-full bg-[#F8F9FA] flex flex-col items-center py-8 px-6 lg:px-[100px] overflow-y-auto order-2 md:order-1">
+      <div className="w-full md:w-1/2 h-full bg-[#F8F9FA] flex flex-col items-center py-8 px-6 lg:px-[100px] overflow-y-auto pb-40 order-2 md:order-1">
         
         {/* Header Section */}
         <div className="w-full max-w-[480px] mb-8">
