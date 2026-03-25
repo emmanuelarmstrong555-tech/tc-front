@@ -6,7 +6,7 @@ import PaymentLayout from "../../components/private/students/PaymentLayout.jsx";
 import RemoveTraining from "../../components/private/students/RemoveTraining.jsx";
 import AddTraining from "../../components/private/students/AddTraining.jsx";
 import PaymentMethodModal from "../../components/private/students/PaymentMethodModal.jsx";
-import { BellIcon, ChevronLeftIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { BellIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function StudentPaymentDisplay() {
@@ -32,6 +32,24 @@ export default function StudentPaymentDisplay() {
     { key: "annual", label: "Annual", months: 12 },
   ];
 
+  // Calculate expiry date from start date + billing cycle
+  const calculateExpiryDate = (startDate, billingCycle) => {
+    if (!startDate || !billingCycle) return null;
+    const start = new Date(startDate);
+    if (isNaN(start.getTime())) return null;
+    
+    const monthsMap = {
+      monthly: 1,
+      quarterly: 3,
+      semi_annual: 6,
+      annual: 12,
+    };
+    const months = monthsMap[billingCycle] || 1;
+    const expiry = new Date(start);
+    expiry.setMonth(expiry.getMonth() + months);
+    return expiry;
+  };
+
   const calculatePrice = (basePrice, months) => {
     const total = basePrice * months;
     return months === 1 ? total : total - total * 0.05;
@@ -40,11 +58,7 @@ export default function StudentPaymentDisplay() {
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
   const token = localStorage.getItem("student_token");
 
-  const paymentMethods = [
-    { id: "paystack", name: "Paystack" },
-    { id: "paypal", name: "Paypal" },
-    { id: "interswitch", name: "Inter-switch" },
-  ];
+
 
   // Auto-dismiss toast
   useEffect(() => {
@@ -212,7 +226,7 @@ export default function StudentPaymentDisplay() {
                 Number(c.course_id) === Number(payment.course_id)
               );
               
-              const displayTitle = payment.course?.title || payment.course_name || relatedCourse?.course?.title || payment.name || `Payment #${payment.id}`;
+              const displayTitle = payment.course?.title || payment.course_title || payment.course_name || relatedCourse?.course?.title || payment.name || `Payment #${payment.id}`;
 
               return (
                 <div
@@ -231,9 +245,17 @@ export default function StudentPaymentDisplay() {
                         Cancelled
                       </span>
                     )}
-                    <span className={`text-[12px] font-medium whitespace-nowrap ${payment.status === 'cancelled' || payment.status === 'removed' ? 'text-red-400' : 'text-gray-500'}`}>
-                      {payment.status === 'cancelled' || payment.status === 'removed' ? 'Expired - --' : `Expired - ${formatDate(payment.end_date || payment.expires_at || payment.expiry_date)}`}
-                    </span>
+                    {(() => {
+                      const isCancelled = payment.status === 'cancelled' || payment.status === 'removed';
+                      const startDate = payment.start_date || payment.paid_at || payment.created_at;
+                      const computedExpiry = calculateExpiryDate(startDate, payment.billing_cycle);
+                      const expiryDisplay = computedExpiry ? formatDate(computedExpiry) : formatDate(payment.end_date || payment.expires_at || payment.expiry_date);
+                      return (
+                        <span className={`text-[12px] font-medium whitespace-nowrap ${isCancelled ? 'text-red-400' : 'text-gray-500'}`}>
+                          {isCancelled ? 'Expired - --' : `Expires - ${expiryDisplay}`}
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
               );
