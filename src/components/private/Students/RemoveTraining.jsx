@@ -50,7 +50,8 @@ export default function RemoveTraining({
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
         </div>
         <h2 className="text-2xl font-black text-[#0F2843] mb-2">Remove Course</h2>
-        <p className="text-gray-500 text-sm mb-8 leading-relaxed">Are you sure you want to remove <span className="font-bold text-gray-700">{selectedToRemove?.course?.title || "this course"}</span> from your training list?</p>
+        <p className="text-gray-500 text-sm mb-2 leading-relaxed">Are you sure you want to remove <span className="font-bold text-gray-700">{selectedToRemove?.course?.title || "this course"}</span> from your training list?</p>
+        <p className="text-red-500 text-xs font-bold mb-8 leading-relaxed">A cancelled course cannot be reactivated. Are you sure you want to cancel?</p>
         <div className="flex flex-col gap-3">
           <button onClick={handleRemoveSubmit} disabled={removeLoading} className="w-full py-4 bg-[#09314F] text-white font-bold rounded-xl hover:bg-red-600 transition-all shadow-md active:scale-95 disabled:bg-gray-400">
             {removeLoading ? "Removing..." : "Yes, Remove"}

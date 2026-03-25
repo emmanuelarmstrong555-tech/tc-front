@@ -2,9 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { 
   BellIcon, 
-  ChevronLeftIcon, 
-  CheckCircleIcon,
-  PlusCircleIcon
+  ChevronLeftIcon
 } from "@heroicons/react/24/outline";
 import SubjectSelectionModal from "./SubjectSelectionModal";
 import ReviewSelectionModal from "./ReviewSelectionModal";

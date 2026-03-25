@@ -3,72 +3,63 @@ import axios from "axios";
 import StaffDashboardLayout from "../../../components/private/staffs/DashboardLayout.jsx";
 import { 
   MagnifyingGlassIcon,
+  CalendarIcon,
+  LinkIcon,
+  VideoCameraIcon
 } from "@heroicons/react/24/outline";
 import { Icon } from "@iconify/react";
 
 export default function TutorMasterClass() {
-  const [classes, setClasses] = useState([]);
+  const [scheduleData, setScheduleData] = useState({
+    next_class: null,
+    today_classes: [],
+    week_schedule: {},
+    upcoming_sessions: []
+  });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState(null);
-  const [copiedLink, setCopiedLink] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [videoLink, setVideoLink] = useState("");
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
+  const staffName = localStorage.getItem("staff_name") || "Tutor";
+  const staffRole = localStorage.getItem("staff_role") || "Tutor";
   const token = localStorage.getItem("staff_token");
 
   // --- FETCHING LOGIC ---
-  const fetchClasses = useCallback(async () => {
+  const fetchSessions = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/tutor/classes`, {
+      const response = await axios.get(`${API_BASE_URL}/api/tutor/classes/schedule`, {
         headers: { 
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json"
         }
       });
       
-      const fetchedClasses = response?.data?.classes;
-      if (Array.isArray(fetchedClasses)) {
-        setClasses(fetchedClasses);
-      } else {
-        setClasses([]);
-      }
+      console.log("Full Tiered API Response:", response.data);
+      const data = response.data || {};
+      
+      setScheduleData({
+        next_class: data.next_class || null,
+        today_classes: Array.isArray(data.today_classes) ? data.today_classes : [],
+        week_schedule: data.week_schedule || {},
+        upcoming_sessions: Array.isArray(data.upcoming_sessions) ? data.upcoming_sessions : []
+      });
+
     } catch (error) {
       console.error("Fetch error:", error);
-      setClasses([]);
-      setToast({ type: "error", message: "Failed to load your master classes." });
+      setToast({ type: "error", message: "Failed to load master class schedule." });
     } finally {
       setLoading(false);
     }
   }, [API_BASE_URL, token]);
 
   useEffect(() => {
-    fetchClasses();
-  }, [fetchClasses]);
-
-  // --- GROUPING ---
-  const filteredList = useMemo(() => {
-    if (!Array.isArray(classes)) return [];
-    if (!searchQuery) return classes;
-    return classes.filter(cls => 
-      cls.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cls.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [classes, searchQuery]);
-
-  const todayClasses = useMemo(() => {
-    const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    return filteredList.filter(cls =>
-      cls.schedules?.some(schedule => schedule.day_of_week === dayOfWeek)
-    );
-  }, [filteredList]);
-
-  const olderClasses = useMemo(() => {
-    const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    return filteredList.filter(cls =>
-      !cls.schedules?.some(schedule => schedule.day_of_week === dayOfWeek)
-    );
-  }, [filteredList]);
+    fetchSessions();
+  }, [fetchSessions]);
 
   // --- HELPERS ---
   const formatDate = (dateStr) => {
@@ -86,78 +77,113 @@ export default function TutorMasterClass() {
     return `${h12}:${m}${ampm}`;
   };
 
-  const copyToClipboard = (link, classId) => {
-    navigator.clipboard.writeText(link);
-    setCopiedLink(classId);
-    setTimeout(() => setCopiedLink(null), 2000);
+  const getInitials = (title) => {
+    if (!title) return "ME";
+    return title.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
   };
 
-  // --- CLASS ROW ---
-  const ClassRow = ({ cls }) => {
-    const isLinkCopied = copiedLink === cls.id;
-    const schedule = cls.schedules?.[0];
-    const startTime = schedule ? formatTime(schedule.start_time) : "—";
+  // --- SEARCH FILTERING ---
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return scheduleData;
     
-    let link = cls.class_link;
-    if (!link && cls.schedules && cls.schedules.length > 0) {
-       for (let sched of cls.schedules) {
-          if (sched.sessions && sched.sessions.length > 0) {
-             const found = sched.sessions.find(s => s.class_link);
-             if (found) { link = found.class_link; break; }
-          }
-       }
+    const filterFn = (s) => (
+      s.session_date?.includes(searchQuery) ||
+      s.class?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return {
+      next_class: scheduleData.next_class && filterFn(scheduleData.next_class) ? scheduleData.next_class : null,
+      today_classes: scheduleData.today_classes.filter(filterFn),
+      week_schedule: Object.entries(scheduleData.week_schedule).reduce((acc, [date, sessions]) => {
+        const matching = sessions.filter(filterFn);
+        if (matching.length > 0) acc[date] = matching;
+        return acc;
+      }, {}),
+      upcoming_sessions: scheduleData.upcoming_sessions.filter(filterFn)
+    };
+  }, [scheduleData, searchQuery]);
+
+  // --- ACTIONS ---
+  const handleSaveVideoLink = async () => {
+    if (!selectedSession) return;
+    setSaveLoading(true);
+    try {
+      await axios.post(`${API_BASE_URL}/api/tutor/sessions/${selectedSession.id}/video-link`, {
+        recording_link: videoLink
+      }, {
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json" 
+        }
+      });
+      
+      setToast({ type: "success", message: "Video link updated successfully!" });
+      setSelectedSession(null);
+      fetchSessions();
+    } catch (error) {
+      console.error("Save error:", error);
+      setToast({ type: "error", message: "Failed to update video link." });
+    } finally {
+      setSaveLoading(false);
     }
+  };
 
-    return (
-      <div className="flex items-center gap-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-all px-4 rounded-xl group">
-        <div className="relative flex-shrink-0">
-          <div className="w-11 h-11 rounded-full bg-[#E5E7EB] text-[#4B5563] text-xs font-black flex items-center justify-center shadow-inner border border-white">
-            ME
-          </div>
-          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#F5A623] border-2 border-white rounded-full shadow-sm" />
+  const openModal = (session) => {
+    setSelectedSession(session);
+    setVideoLink(session.recording_link || "");
+  };
+
+  // --- UI COMPONENTS ---
+  const SessionRow = ({ session, isNext = false }) => (
+    <div 
+      onClick={() => openModal(session)}
+      className={`flex items-center gap-4 md:gap-8 py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50/80 transition-all px-4 rounded-xl cursor-pointer group ${isNext ? "bg-amber-50/50 hover:bg-amber-50" : ""}`}
+    >
+      <div className={`w-10 h-10 rounded-full text-[10px] font-black flex items-center justify-center border border-white shadow-sm shrink-0 ${isNext ? "bg-amber-500 text-white" : "bg-slate-200 text-slate-600"}`}>
+        {getInitials(session.class?.title)}
+      </div>
+      
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-2">
+           {isNext && <span className="text-[10px] font-black bg-amber-500 text-white px-1.5 py-0.5 rounded leading-none">NEXT</span>}
+           <span className="text-[14px] font-bold text-[#374151] truncate" title={session.class?.title}>
+             {session.class?.title || "Master Class"}
+           </span>
         </div>
-
-        <div className="flex-1 flex flex-row items-center justify-between gap-3 overflow-hidden">
-          <div className="flex-[2] min-w-0">
-             <span className="text-[15px] font-bold text-[#1F2937] truncate block" title={cls.title}>
-                {cls.title}
+        <span className="text-[13px] font-medium text-slate-500 md:text-center">
+          {formatDate(session.session_date)}
+        </span>
+        <span className="text-[13px] font-medium text-slate-500 md:text-center">
+          {formatTime(session.starts_at)}
+        </span>
+        <div className="truncate text-right hidden md:block">
+           {session.class_link ? (
+             <span className="text-[13px] text-blue-400 font-medium underline underline-offset-4 decoration-dotted">
+               {session.class_link.replace(/^https?:\/\//, '')}
              </span>
-          </div>
+           ) : (
+             <span className="text-xs text-slate-300 italic">No link</span>
+           )}
+        </div>
+      </div>
+    </div>
+  );
 
-          <div className="flex-shrink-0 flex items-center gap-4 text-center">
-            <span className="text-sm font-bold text-gray-600 whitespace-nowrap hidden md:block">
-              {formatDate(cls.start_date)}
-            </span>
-            <span className="text-sm font-bold text-[#0F2843] whitespace-nowrap min-w-[65px]">
-              {startTime}
-            </span>
-          </div>
-
-          <div className="flex-shrink-0 min-w-0 flex justify-end">
-             {link ? (
-               <div className="flex items-center gap-2">
-                 <a
-                   href={link}
-                   target="_blank"
-                   rel="noreferrer"
-                   className="text-sm text-blue-500 font-bold hover:underline truncate max-w-[100px] lg:max-w-[150px]"
-                 >
-                   {link.replace(/^https?:\/\//, '')}
-                 </a>
-                 <button 
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(link, cls.id);
-                   }}
-                   className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
-                 >
-                   <Icon icon={isLinkCopied ? "mdi:check" : "mdi:content-copy"} className={`w-3.5 h-3.5 ${isLinkCopied ? "text-green-500" : "text-blue-400"}`} />
-                 </button>
-               </div>
-             ) : (
-               <span className="text-xs text-gray-300 italic">No link</span>
-             )}
-          </div>
+  const Section = ({ title, sessions, isEmpty = false }) => {
+    if (isEmpty || (Array.isArray(sessions) && sessions.length === 0)) return null;
+    return (
+      <div className="mb-10">
+        <h3 className="text-[11px] font-black text-slate-400 mb-5 px-4 uppercase tracking-[0.25em]">{title}</h3>
+        <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+          {Array.isArray(sessions) ? (
+            sessions.map(s => <SessionRow key={s.id} session={s} />)
+          ) : (
+             Object.entries(sessions).map(([date, dateSessions]) => (
+                <div key={date}>
+                  {dateSessions.map(s => <SessionRow key={s.id} session={s} />)}
+                </div>
+             ))
+          )}
         </div>
       </div>
     );
@@ -166,64 +192,141 @@ export default function TutorMasterClass() {
   return (
     <StaffDashboardLayout>
       {toast && (
-        <div className={`fixed top-5 right-5 z-50 px-6 py-4 rounded-2xl shadow-2xl text-white bg-${toast.type === "success" ? "[#76D287]" : "[#E83831]"}`}>
-          <p className="font-bold text-sm">{toast.message}</p>
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-2xl text-white font-bold text-sm ${toast.type === "success" ? "bg-[#10B981]" : "bg-[#EF4444] animate-bounce"}`}>
+          {toast.message}
+          <button onClick={() => setToast(null)} className="ml-4 hover:opacity-70">×</button>
         </div>
       )}
 
-      <div className="p-6 max-w-5xl mx-auto w-full">
+      <div className="p-6 max-w-5xl mx-auto w-full min-h-screen">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-black text-[#0F2843] tracking-tighter uppercase">Master Class</h1>
-          <button className="relative p-2 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+          <h1 className="text-[32px] font-black text-[#0F2843] tracking-tighter uppercase">Master Class</h1>
+          <button className="relative p-2.5 bg-white rounded-[20px] shadow-sm border border-gray-100 hover:shadow-md transition-all">
             <Icon icon="mdi:bell" className="text-[#0F2843] w-6 h-6" />
-            <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-[#E83831] border-2 border-white rounded-full" />
+            <span className="absolute top-3.5 right-3.5 w-2.5 h-2.5 bg-[#E83831] border-2 border-white rounded-full" />
           </button>
         </div>
 
         <div className="mb-10 max-w-sm">
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <div className="relative group">
+            <MagnifyingGlassIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#0F2843] transition-colors" />
             <input
               type="text"
               placeholder="Search by date"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 border border-gray-200 rounded-2xl text-[15px] font-bold text-[#1F2937] focus:ring-2 focus:ring-[#0F2843] focus:border-transparent bg-white shadow-sm transition-all"
+              className="w-full pl-14 pr-6 py-4 border border-gray-200 rounded-[24px] text-[15px] font-bold text-[#1F2937] focus:ring-4 focus:ring-[#0F2843]/5 focus:border-[#0F2843] bg-white shadow-sm transition-all"
             />
           </div>
         </div>
 
         {loading ? (
           <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#09314F] mx-auto" />
-            <p className="mt-4 text-gray-600 font-bold">Loading your classes...</p>
-          </div>
-        ) : (todayClasses.length === 0 && olderClasses.length === 0) ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-            <p className="text-gray-400 text-lg font-bold">No classes assigned yet.</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#0F2843] mx-auto" />
+            <p className="mt-4 text-slate-400 font-bold">Refining your schedule...</p>
           </div>
         ) : (
-          <div>
-            {todayClasses.length > 0 && (
-              <div className="mb-10">
-                <h3 className="text-sm font-black text-gray-800 mb-4 px-2 uppercase tracking-widest">Today</h3>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-1">
-                  {todayClasses.map(cls => <ClassRow key={cls.id} cls={cls} />)}
+          <div className="space-y-4">
+            {/* Next Class - Special Focus */}
+            {filteredData.next_class && (
+              <div className="mb-12">
+                <h3 className="text-[11px] font-black text-amber-500 mb-5 px-4 uppercase tracking-[0.25em]">Next Up</h3>
+                <div className="bg-white rounded-[32px] border border-amber-100 shadow-lg shadow-amber-50 overflow-hidden ring-2 ring-amber-500/10">
+                  <SessionRow session={filteredData.next_class} isNext={true} />
                 </div>
               </div>
             )}
 
-            {olderClasses.length > 0 && (
-              <div>
-                <h3 className="text-sm font-black text-gray-800 mb-4 px-2 uppercase tracking-widest">Older</h3>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-1">
-                  {olderClasses.map(cls => <ClassRow key={cls.id} cls={cls} />)}
-                </div>
+            <Section title="Today" sessions={filteredData.today_classes} />
+            <Section title="This Week" sessions={filteredData.week_schedule} />
+            <Section title="Upcoming" sessions={filteredData.upcoming_sessions} />
+
+            {/* Empty State */}
+            {!filteredData.next_class && 
+             filteredData.today_classes.length === 0 && 
+             Object.keys(filteredData.week_schedule).length === 0 && 
+             filteredData.upcoming_sessions.length === 0 && (
+              <div className="text-center py-24 bg-gray-50/50 rounded-[48px] border-2 border-dashed border-gray-200 mx-4">
+                <Icon icon="mdi:calendar-blank" className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+                <p className="text-slate-400 text-lg font-bold">Your agenda is clear.</p>
               </div>
             )}
           </div>
         )}
       </div>
+
+      {/* Details Modal */}
+      {selectedSession && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedSession(null)} />
+          <div className="relative bg-white rounded-[32px] p-8 md:p-10 w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-2xl font-black text-[#0F2843] mb-8">Details</h2>
+            
+            <div className="space-y-6">
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                <p className="text-[15px] font-bold text-slate-700">
+                  {staffRole} - {staffName}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 text-slate-600">
+                <CalendarIcon className="w-5 h-5 shrink-0" />
+                <span className="text-[14px] font-bold uppercase tracking-tight">
+                  {new Date(selectedSession.session_date).toLocaleDateString("en-US", { weekday: 'short' })}, {formatDate(selectedSession.session_date)} / {formatTime(selectedSession.starts_at).toUpperCase()}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4 text-slate-600">
+                <div className="w-5 h-5 bg-[#C5A97A] rounded shrink-0" />
+                <span className="text-[14px] font-bold">
+                  {selectedSession.class?.title}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4 text-blue-500">
+                <LinkIcon className="w-5 h-5 shrink-0" />
+                <a 
+                  href={selectedSession.class_link} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="text-[14px] font-medium underline underline-offset-4 decoration-dotted truncate"
+                >
+                  {selectedSession.class_link || "No link assigned"}
+                </a>
+              </div>
+
+              <div className="flex items-center gap-4 relative">
+                <VideoCameraIcon className="w-5 h-5 text-slate-400 shrink-0" />
+                <div className="flex-1">
+                  <input
+                    type="url"
+                    placeholder="Add Video Link"
+                    value={videoLink}
+                    onChange={(e) => setVideoLink(e.target.value)}
+                    className="w-full bg-slate-100 border-none rounded-2xl py-4 px-6 text-[14px] font-medium focus:ring-2 focus:ring-[#0F2843] transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 mt-10">
+              <button 
+                onClick={() => setSelectedSession(null)}
+                className="flex-1 py-4 bg-[#EF4444] text-white font-bold rounded-2xl hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-100 uppercase text-[11px] tracking-widest"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSaveVideoLink}
+                disabled={saveLoading}
+                className="flex-1 py-4 bg-[#0F2843] text-white font-bold rounded-2xl hover:bg-[#1a3d5c] transition-all active:scale-95 shadow-lg shadow-slate-200 disabled:opacity-50 uppercase text-[11px] tracking-widest"
+              >
+                {saveLoading ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </StaffDashboardLayout>
   );
 }

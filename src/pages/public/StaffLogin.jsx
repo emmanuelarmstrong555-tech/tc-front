@@ -38,7 +38,7 @@ export default function StaffLogin() {
     } else if (countdown === 0) {
       const role = localStorage.getItem("staff_role");
       if (role === "admin") {
-        navigate("/staffs/dashboard");
+        navigate("/staffs/manage-staffs");
       } else {
         navigate("/staffs/tutor/dashboard");
       }
