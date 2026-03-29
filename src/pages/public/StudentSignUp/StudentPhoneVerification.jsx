@@ -170,7 +170,7 @@ export default function StudentPhoneVerification() {
   const handleResend = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/Students/resend-phone-otp`,
+        `${API_BASE_URL}/api/students/resend-phone-otp`,
         { tel: tel },
       );
       setToast({ type: "success", message: response?.data?.message || "OTP resent successfully." });
