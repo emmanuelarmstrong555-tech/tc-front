@@ -221,14 +221,14 @@ export const StudentSubjectSelection = () => {
                     {course.title}
                   </div>
 
-                  <div className="px-2 relative">
+                  <div className="px-2 relative min-w-0">
                     <button
                       id={`toggle-${course.id}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenDropdown(isOpen ? null : course.id);
                       }}
-                      className="w-full min-h-[44px] flex items-center transition-all group pointer-events-auto"
+                      className="w-full min-w-0 min-h-[44px] flex items-center transition-all group pointer-events-auto"
                     >
                       <div className={dropdownTheme.subjectPreview}>
                         {selectedIds.length > 0 ? (

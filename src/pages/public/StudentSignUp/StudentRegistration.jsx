@@ -155,51 +155,35 @@ export default function StudentRegistration() {
     setLoading(true);
 
     try {
-      // 1. Register Account
-      const registerPayload = {
-        email: formData.email.trim() || null,
-        tel: formData.tel.trim() || null,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        password_confirmation: formData.confirmPassword,
-        firstname: formData.firstname,
-        surname: formData.surname,
-        gender: formData.gender,
-        date_of_birth: formData.date_of_birth,
-        location: formData.location,
-        address: formData.address,
-        department: formData.department,
-      };
+      // Register Account and Submit Biodata together
+      const combinedPayload = new FormData();
+      if (formData.email.trim()) combinedPayload.append('email', formData.email.trim());
+      if (formData.tel.trim()) combinedPayload.append('tel', formData.tel.trim());
+      combinedPayload.append('password', formData.password);
+      combinedPayload.append('confirmPassword', formData.confirmPassword);
+      combinedPayload.append('password_confirmation', formData.confirmPassword);
+      combinedPayload.append('firstname', formData.firstname);
+      combinedPayload.append('surname', formData.surname);
+      combinedPayload.append('gender', formData.gender);
+      combinedPayload.append('date_of_birth', formData.date_of_birth);
+      combinedPayload.append('location', formData.location);
+      combinedPayload.append('address', formData.address || '');
+      combinedPayload.append('department', formData.department);
+      
+      if (formData.profile_picture) {
+        combinedPayload.append('profile_picture', formData.profile_picture);
+      }
 
-      const registerRes = await axios.post(`${API_BASE_URL}/api/students/register`, registerPayload);
+      const registerRes = await axios.post(`${API_BASE_URL}/api/students/register`, combinedPayload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
-      if (registerRes.status === 201) {
-        // 2. Submit Biodata
-        const biodataForm = new FormData();
-        biodataForm.append('firstname', formData.firstname);
-        biodataForm.append('surname', formData.surname);
-        biodataForm.append('gender', formData.gender);
-        biodataForm.append('date_of_birth', formData.date_of_birth);
-        biodataForm.append('location', formData.location);
-        biodataForm.append('address', formData.address || '');
-        biodataForm.append('department', formData.department);
-        
-        if (formData.email.trim()) biodataForm.append('email', formData.email.trim());
-        if (formData.tel.trim()) biodataForm.append('tel', formData.tel.trim());
-
-        if (formData.profile_picture) {
-          biodataForm.append('profile_picture', formData.profile_picture);
+      if (registerRes.status === 200 || registerRes.status === 201) {
+        if (registerRes.data?.student) {
+          localStorage.setItem('studentdata', JSON.stringify({ data: registerRes.data.student }));
         }
-
-        const biodataRes = await axios.post(`${API_BASE_URL}/api/students/biodata`, biodataForm, { 
-          headers: { 'Content-Type': 'multipart/form-data' } 
-        });
-
-        if (biodataRes.status === 200 || biodataRes.status === 201) {
-          localStorage.setItem('studentdata', JSON.stringify({ data: biodataRes.data.student }));
-          setToast({ type: "success", message: "Registration Successful!" });
-          setShowModal(true);
-        }
+        setToast({ type: "success", message: "Registration Successful!" });
+        setShowModal(true);
       }
     } catch (error) {
       console.error("Submit error:", error.response?.data || error);

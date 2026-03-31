@@ -107,7 +107,7 @@ export default function StudentEmailVerification() {
     if (!validateForm()) return;
 
     setLoading(true);
-    const otp =
+    const token =
       formData.num1 +
       formData.num2 +
       formData.num3 +
@@ -117,10 +117,10 @@ export default function StudentEmailVerification() {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/students/verify-email-otp`,
+        `${API_BASE_URL}/api/students/verify-email`,
         {
           email: email,
-          otp: otp,
+          token: token,
         },
       );
 
@@ -149,7 +149,7 @@ export default function StudentEmailVerification() {
   const handleResend = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/students/resend-email-otp`,
+        `${API_BASE_URL}/api/students/resend-email`,
         { email: email },
       );
       setToast({ type: "success", message: "OTP resent successfully." });
