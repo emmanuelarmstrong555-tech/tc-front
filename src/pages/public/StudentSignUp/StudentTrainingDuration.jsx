@@ -120,10 +120,10 @@ export const StudentTrainingDuration = () => {
         
         {/* NAV & HEADER */}
         <div className="w-full max-w-[500px] mb-10 text-center">
-          <div className="flex items-center relative h-12 mb-6">
+          <div className="flex items-center relative h-12 mb-6 pointer-events-none z-50">
             <button 
               onClick={() => navigate(-1)} 
-              className="absolute left-0 p-3 bg-white hover:bg-gray-50 rounded-2xl shadow-sm transition-all active:scale-90"
+              className="fixed top-6 left-6 md:absolute md:left-0 p-3 bg-white hover:bg-gray-50 rounded-2xl shadow-md md:shadow-sm transition-all active:scale-90 border border-gray-100 md:border-none pointer-events-auto"
             >
               <ChevronLeftIcon className="h-5 w-5 text-[#09314F] stroke-[2.5]" />
             </button>

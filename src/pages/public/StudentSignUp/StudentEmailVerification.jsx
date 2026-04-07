@@ -206,10 +206,10 @@ export default function StudentEmailVerification() {
       {/* LEFT SIDE: Content Area */}
       <div className="w-full md:w-1/2 h-full bg-white flex flex-col px-6 py-11 lg:px-[100px] lg:y-[60px] order-2 md:order-1 overflow-y-auto">
         
-        <div className="relative w-full flex items-center justify-center mb-10">
+        <div className="relative w-full flex items-center justify-center mb-10 pointer-events-none z-50">
           <button 
             onClick={() => navigate("/register/student")}
-            className="absolute left-0 p-3 bg-[#F7EFEF] hover:bg-gray-100 rounded-2xl transition-all active:scale-90"
+            className="fixed top-6 left-6 md:absolute md:left-0 p-3 bg-white hover:bg-gray-50 rounded-2xl shadow-md md:shadow-sm transition-all active:scale-90 border border-gray-100 md:border-none pointer-events-auto"
           >
             <ChevronLeftIcon className="h-5 w-5 text-[#09314F] stroke-[2.5]" />
           </button>
