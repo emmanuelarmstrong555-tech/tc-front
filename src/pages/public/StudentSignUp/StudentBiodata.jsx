@@ -235,10 +235,10 @@ export default function StudentBiodata() {
         
         {/* Header Section */}
         <div className="w-full max-w-[480px] mb-8">
-          <div className="flex items-center relative h-12 mb-6">
+          <div className="flex items-center relative h-12 mb-6 pointer-events-none z-50">
             <button 
               onClick={() => navigate("/register/student")}
-              className="absolute left-0 p-3 bg-white hover:bg-gray-50 rounded-2xl shadow-sm transition-all active:scale-90"
+              className="fixed top-6 left-6 md:absolute md:left-0 p-3 bg-white hover:bg-gray-50 rounded-2xl shadow-md md:shadow-sm transition-all active:scale-90 border border-gray-100 md:border-none pointer-events-auto"
             >
               <ChevronLeftIcon className="h-5 w-5 text-[#09314F] stroke-[2.5]" />
             </button>
@@ -340,9 +340,9 @@ export default function StudentBiodata() {
               {/* Date of Birth */}
               <div className="space-y-2">
                 <label className="text-xs font-black text-[#555555] uppercase tracking-widest px-1">Date of Birth</label>
-                <div ref={dateContainerRef} className={`${getInputStyles("date_of_birth").container} relative`} style={{ position: "relative" }}>
+                <div ref={dateContainerRef} className={getInputStyles("date_of_birth").container} style={{ position: "relative" }}>
                   <CalendarIcon 
-                    className={`${getInputStyles("date_of_birth").icon} cursor-pointer hover:text-[#09314F] transition-colors relative z-10`} 
+                    className={`${getInputStyles("date_of_birth").icon} pointer-events-none hover:text-[#09314F] transition-colors relative z-10`} 
                     onClick={() => {
                       if (!isIOS() && dateInputRef.current?.showPicker) {
                         dateInputRef.current.showPicker();
@@ -373,7 +373,7 @@ export default function StudentBiodata() {
                       height: "100%",
                       opacity: 0,
                       cursor: "pointer",
-                      zIndex: 20,
+                      zIndex: 40,
                     } : {}}
                   />
                 </div>
