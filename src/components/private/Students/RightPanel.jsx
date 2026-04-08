@@ -79,6 +79,7 @@ export default function RightPanel({ collapsed, setCollapsed }) {
     <aside
       className={`
         fixed top-2 right-2 h-screen z-[40]
+        rounded-xl
         w-80 transition-all duration-300 ease-in-out
         ${collapsed ? "translate-x-[298px]" : "translate-x-0"}
         bg-white dark:bg-gray-900 shadow-2xl
@@ -94,11 +95,11 @@ export default function RightPanel({ collapsed, setCollapsed }) {
             onClick={() => setCollapsed(!collapsed)}
             className={`
               absolute -left-2 top-[60%] -translate-y-1/2
-              bg-blue-900 text-white
+              bg-[#09314F] text-white
               w-5 h-9
               rounded-r-xl
               flex items-center justify-center
-              hover:bg-blue-800 z-10
+              hover:bg-[#09314F]/80 z-10
               transition-all duration-300 ease-in-out
             `}
           >

@@ -217,23 +217,30 @@ export default function StudentPaymentDisplay() {
               return (
                 <div
                   key={payment.id || `history-${index}`}
-                  className="flex flex-wrap items-center justify-between gap-4 py-4 border-b border-gray-200 dark:border-[#09314F]/50 last:border-0"
+                  className="flex flex-wrap items-center justify-between gap-4 py-4 border-b border-gray-300 dark:border-blue-600 last:border-0"
                 >
                   <span className={`text-sm font-black tracking-wide min-w-[80px] ${payment.status === 'cancelled' || payment.status === 'removed' ? 'text-red-500 dark:text-red-400' : 'text-[#09314F] dark:text-[#3A5ECC]'}`}>
                     {displayTitle}
                   </span>
                   <div className="flex items-center gap-3">
-                    <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
-                      Paid - {formatDate(payment.start_date || payment.paid_at || payment.created_at)}
-                    </span>
+                    {(payment.status === 'successful' || payment.status === 'paid') && (
+                      <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[11px] font-black uppercase tracking-tighter border border-green-100 shadow-sm whitespace-nowrap">
+                        Paid - {formatDate(payment.start_date || payment.paid_at || payment.created_at)}
+                      </span>
+                    )}
+                    {(payment.status === 'cancelled' || payment.status === 'removed') && (
+                      <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
+                        Paid - {formatDate(payment.start_date || payment.paid_at || payment.created_at)}
+                      </span>
+                    )}
+                    {payment.status !== 'successful' && payment.status !== 'paid' && payment.status !== 'cancelled' && payment.status !== 'removed' && (
+                      <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
+                        Paid - {formatDate(payment.start_date || payment.paid_at || payment.created_at)}
+                      </span>
+                    )}
                     {(payment.status === 'cancelled' || payment.status === 'removed') && (
                       <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-tighter border border-red-100 shadow-sm">
                         Cancelled
-                      </span>
-                    )}
-                    {(payment.status === 'successful' || payment.status === 'paid') && (
-                      <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-tighter border border-green-100 shadow-sm">
-                        Paid
                       </span>
                     )}
                     {(() => {

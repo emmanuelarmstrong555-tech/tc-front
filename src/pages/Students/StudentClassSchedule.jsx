@@ -305,8 +305,8 @@ export default function StudentClassSchedule() {
         {/* EXPANDED VIEW (Info Card) */}
         {!isHighRes && !isMobile && isExpanded && (
           <div className="w-full bg-white dark:bg-[#09314F]/80 dark:backdrop-blur-md p-8 md:p-10 flex flex-col justify-between animate-in fade-in zoom-in-95 duration-300 border-t border-gray-50 dark:border-white/10 mt-2 rounded-b-[40px]">
-             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-               <div className="flex items-center gap-8">
+            <div className="flex flex-wrap gap-8">
+               <div className="flex items-center gap-8 flex-1 min-w-[280px]">
                  <div className="w-20 h-20 rounded-3xl overflow-hidden bg-gray-50 border-2 border-[#BB9E7F]/30 p-1 shadow-lg">
                     {tutor?.profile_picture ? (
                       <img 
@@ -320,7 +320,7 @@ export default function StudentClassSchedule() {
                  </div>
                  <div className="flex flex-col">
                    <span className="px-3 py-1 bg-[#BB9E7F] text-white rounded-full text-[10px] font-black uppercase tracking-widest mb-3 self-start shadow-sm">Full Session Details</span>
-                   <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-[#09314F] dark:text-white leading-none mb-2">
+                   <h3 className="text-2xl font-black italic uppercase tracking-tighter text-[#09314F] dark:text-white leading-none mb-2">
                      {session.class?.title || "Master Class Session"}
                    </h3>
                    <div className="flex flex-wrap items-center gap-4 text-gray-400 font-bold text-sm">
@@ -328,7 +328,7 @@ export default function StudentClassSchedule() {
                         <UserIcon className="w-4 h-4 text-[#BB9E7F]" />
                         <span>{tutor ? `${tutor.firstname} ${tutor.surname}` : "Expert Tutor"}</span>
                       </div>
-                      <div className="hidden md:block w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
+                      <div className="hidden lg:block w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
                       <div className="flex items-center gap-2">
                         <ClockIcon className="w-4 h-4 text-[#BB9E7F]" />
                         <span>{formatTime(session.starts_at)} - {formatTime(session.ends_at)}</span>
@@ -337,8 +337,8 @@ export default function StudentClassSchedule() {
                  </div>
                </div>
 
-               <div className="flex flex-col items-start md:items-end gap-3 min-w-[200px] w-full md:w-auto">
-                   <div className="text-left md:text-right w-full">
+               <div className="flex flex-col gap-3 flex-1 min-w-[250px]">
+                   <div className="w-full">
                     <span className="text-[10px] font-black text-gray-300 dark:text-blue-300 uppercase tracking-[0.2em] mb-1 block">Live Meeting Link</span>
                     <button 
                       onClick={(e) => handleJoinClass(e, session)}
@@ -354,20 +354,20 @@ export default function StudentClassSchedule() {
                </div>
              </div>
 
-             <div className="mt-8 pt-8 border-t border-gray-50 dark:border-white/10 flex items-center justify-between">
-                <p className="hidden md:block text-[11px] font-black text-gray-300 dark:text-white/50 uppercase tracking-[0.3em]">
+             <div className="mt-8 pt-8 border-t border-gray-50 dark:border-white/10 flex flex-wrap items-center justify-between gap-4">
+                <p className="hidden lg:block text-[11px] font-black text-gray-300 dark:text-white/50 uppercase tracking-[0.3em]">
                   Click anywhere to close full view
                 </p>
-                <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="flex items-center gap-4 w-full">
                   <button 
                     onClick={(e) => handleJoinClass(e, session)}
-                    className="flex-1 md:flex-none px-10 py-5 bg-[#09314F] text-white font-black rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[11px] text-center"
+                    className="flex-1 px-10 py-5 bg-[#09314F] text-white font-black rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[11px] text-center"
                   >
                     Join Now
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setExpandedSessionId(null); }}
-                    className="md:hidden flex-1 px-8 py-5 bg-gray-100 text-[#09314F] font-black rounded-2xl uppercase tracking-widest text-[11px]"
+                    className="flex-1 lg:hidden px-8 py-5 bg-gray-100 text-[#09314F] font-black rounded-2xl uppercase tracking-widest text-[11px]"
                   >
                     Close
                   </button>

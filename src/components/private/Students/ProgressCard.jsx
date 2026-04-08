@@ -41,7 +41,7 @@ export default function ProgressCard({ title, end_date, subjects = [] }) {
         </div>
 
         {/* Info Row: Subjects Count & Exp Date */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap gap-4 mb-6">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-[#09314F] dark:text-gray-300">Subjects</span>
             <span className="text-sm font-black text-[#09314F] dark:text-white ml-2">{subjects.length}</span>
@@ -54,7 +54,7 @@ export default function ProgressCard({ title, end_date, subjects = [] }) {
 
         {/* Global Progress Bar with Start/Finish labels */}
         <div className="relative mt-2">
-          <div className="flex justify-between items-center mb-1">
+          <div className="flex flex-wrap justify-between items-center gap-2 mb-1">
             <span className="text-[10px] font-bold text-[#09314F] dark:text-gray-400 uppercase tracking-tighter">Start</span>
             <span className="text-[10px] font-bold text-[#09314F] dark:text-gray-400 uppercase tracking-tighter">Finish</span>
           </div>
