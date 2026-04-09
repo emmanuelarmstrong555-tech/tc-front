@@ -115,12 +115,7 @@ const Career = () => {
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <button
-                    onClick={() => navigate("/staff/login")}
-                    className="w-full bg-[#09314F] text-white font-bold py-4 rounded-xl shadow-[1px_1px_4px_0px_rgba(0,0,0,0.25)] hover:opacity-90 transition-all"
-                  >
-                    Staff Login
-                  </button>
+                  
                   <button
                     onClick={() => window.open("https://forms.gle/bCaEdo4yMhsHFBca6", "_blank", "noopener,noreferrer")}
                     className="w-full bg-[#09314F] text-white font-bold py-4 rounded-xl shadow-[1px_1px_4px_0px_rgba(0,0,0,0.25)] hover:opacity-90 transition-all"
@@ -140,6 +135,13 @@ const Career = () => {
                     className="w-full bg-gradient-to-r from-[#09314F] to-[#C23A3A] text-white font-bold py-4 rounded-xl shadow-[1px_1px_4px_0px_rgba(0,0,0,0.25)] hover:brightness-110 transition-all"
                   >
                     Apply as Administrator
+                  </button>
+
+                  <button
+                    onClick={() => navigate("/staff/login")}
+                    className="w-full bg-[#09314F] text-white font-bold py-4 rounded-xl shadow-[1px_1px_4px_0px_rgba(0,0,0,0.25)] hover:opacity-90 transition-all"
+                  >
+                    Staff Login
                   </button>
                 </div>
               </div>
