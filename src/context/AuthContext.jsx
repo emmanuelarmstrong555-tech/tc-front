@@ -8,6 +8,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [isClassActive, setIsClassActive] = useState(false);
   const [isInactiveModalOpen, setIsInactiveModalOpen] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [verificationType, setVerificationType] = useState(null); // 'phone' or 'email'
 
   // Load from localStorage on app start
   useEffect(() => {
@@ -80,6 +82,44 @@ export function AuthProvider({ children }) {
     setIsInactiveModalOpen(false);
   }, []);
 
+  // Determine if profile alert should show
+  const shouldShowProfileAlert = useCallback(() => {
+    if (!student) return false;
+    
+    const hasEmail = student.email && student.email.trim();
+    const hasPhone = student.tel && student.tel.trim();
+    const emailVerified = student.email_verified_at;
+    const phoneVerified = student.tel_verified_at;
+    
+    return (!hasEmail || !emailVerified) || (!hasPhone || !phoneVerified);
+  }, [student]);
+
+  // Get alert message
+  const getAlertMessage = useCallback(() => {
+    if (!student) return "";
+    
+    const hasEmail = student.email && student.email.trim();
+    const hasPhone = student.tel && student.tel.trim();
+    const emailVerified = student.email_verified_at;
+    const phoneVerified = student.tel_verified_at;
+    
+    const missingItems = [];
+    if (!hasEmail || !emailVerified) missingItems.push("update your email");
+    if (!hasPhone || !phoneVerified) missingItems.push("update your phone number");
+    
+    return missingItems.join(" and ");
+  }, [student]);
+
+  const openVerificationModal = useCallback((type) => {
+    setVerificationType(type);
+    setIsVerificationModalOpen(true);
+  }, []);
+
+  const closeVerificationModal = useCallback(() => {
+    setIsVerificationModalOpen(false);
+    setVerificationType(null);
+  }, []);
+
   const updateStudent = (updatedFields) => {
     setStudent((prev) => {
       const merged = { ...prev, ...updatedFields };
@@ -93,27 +133,6 @@ export function AuthProvider({ children }) {
     localStorage.setItem("studentdata", JSON.stringify({ data: studentObj }));
   };
 
-  const refreshStudent = async () => {
-    const currentToken = localStorage.getItem("student_token");
-    if (!currentToken) return;
-    try {
-      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
-      const response = await fetch(`${API_BASE_URL}/api/students/profile`, {
-        headers: {
-          "Authorization": `Bearer ${currentToken}`,
-          "Accept": "application/json"
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const updated = data.student || data.data || data;
-        setStudent(updated);
-        saveStudentToStorage(updated);
-      }
-    } catch (error) {
-      console.error("Failed to refresh student profile:", error);
-    }
-  };
 
   // Interaction monitoring
   useEffect(() => {
@@ -177,13 +196,18 @@ export function AuthProvider({ children }) {
         login,
         logout,
         updateStudent,
-        refreshStudent,
         isAuthenticated: Boolean(token),
         loading,
         isClassActive,
         setIsClassActive,
         isInactiveModalOpen,
-        resetActivity
+        resetActivity,
+        shouldShowProfileAlert: shouldShowProfileAlert(),
+        alertMessage: getAlertMessage(),
+        isVerificationModalOpen,
+        verificationType,
+        openVerificationModal,
+        closeVerificationModal
       }}
     >
       {children}
