@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ProgressCard from "../../components/private/Students/ProgressCard";
+import { useAuth } from "../../context/AuthContext";
 import DashboardLayout from "../../components/private/Students/DashboardLayout.jsx";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -9,29 +10,19 @@ export default function StudentDashboard() {
   const API_BASE_URL =
     process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
 
-  const authToken = localStorage.getItem("student_token");
+  const { student, token: authToken } = useAuth();
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [studentData, setStudentData] = useState(null);
-
-  // Get student data from localStorage
-  useEffect(() => {
-    const storedInfo = localStorage.getItem("student_info");
-    const storedData = localStorage.getItem("studentdata");
-    
-    const data = storedInfo ? JSON.parse(storedInfo) : (storedData ? JSON.parse(storedData)?.data : null);
-    setStudentData(data);
-  }, []);
 
   // Determine if profile alert should show
   const shouldShowProfileAlert = () => {
-    if (!studentData) return false;
+    if (!student) return false;
     
-    const hasEmail = studentData.email && studentData.email.trim();
-    const hasPhone = studentData.tel && studentData.tel.trim();
-    const emailVerified = studentData.email_verified_at;
-    const phoneVerified = studentData.tel_verified_at;
+    const hasEmail = student.email && student.email.trim();
+    const hasPhone = student.tel && student.tel.trim();
+    const emailVerified = student.email_verified_at;
+    const phoneVerified = student.tel_verified_at;
     
     // Show alert if either contact method is missing or unverified
     return (!hasEmail || !emailVerified) || (!hasPhone || !phoneVerified);
@@ -39,12 +30,12 @@ export default function StudentDashboard() {
 
   // Get alert message
   const getAlertMessage = () => {
-    if (!studentData) return "";
+    if (!student) return "";
     
-    const hasEmail = studentData.email && studentData.email.trim();
-    const hasPhone = studentData.tel && studentData.tel.trim();
-    const emailVerified = studentData.email_verified_at;
-    const phoneVerified = studentData.tel_verified_at;
+    const hasEmail = student.email && student.email.trim();
+    const hasPhone = student.tel && student.tel.trim();
+    const emailVerified = student.email_verified_at;
+    const phoneVerified = student.tel_verified_at;
     
     const missingItems = [];
     

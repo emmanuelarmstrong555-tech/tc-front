@@ -4,6 +4,7 @@ import RightPanel from "./RightPanel.jsx";
 import MobileHeader from "./MobileHeader.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import { BellIcon } from "@heroicons/react/24/outline";
+import InactivityModal from "./InactivityModal";
 
 export default function DashboardLayout({ 
   children, 
@@ -67,6 +68,7 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+      <InactivityModal />
     </div>
   );
 }

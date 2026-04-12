@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import DashboardLayout from "../../components/private/Students/DashboardLayout";
+import { useAuth } from "../../context/AuthContext";
 import { 
   BellIcon, 
   MagnifyingGlassIcon, 
@@ -14,8 +15,8 @@ import {
 import { useNavigate } from "react-router-dom";
 
 export default function StudentClassSchedule() {
+  const { token: authToken } = useAuth();
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://tutorialcenter-back.test";
-  const authToken = localStorage.getItem("student_token");
   const navigate = useNavigate();
 
   // --- STATE ---

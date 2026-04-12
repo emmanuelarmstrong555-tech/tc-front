@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import GoogleMeetSessions from '../../components/private/Students/GoogleMeetSessions';
+import DashboardLayout from '../../components/private/Students/DashboardLayout';  
 
 export default function StudentMeetWrapper() {
   const location = useLocation();
@@ -53,14 +54,14 @@ export default function StudentMeetWrapper() {
   }
 
   return (
-    <div className="dashboard-grid">
-    <div className="sidebar">...</div>
-    <div className="main-content">
-        <div className="video-session-area">
-             {/* This div is now our 'embedded' meet area */}
-             <GoogleMeetSessions /> 
-        </div>
-    </div>
-</div>
+    <DashboardLayout pagetitle="Live Class Session">
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <GoogleMeetSessions 
+          class_link={sessionDetails.class_link}
+          class_schedule_id={sessionDetails.class_schedule_id}
+          studentId={sessionDetails.studentId}
+        />
+      </div>
+    </DashboardLayout>
   );
 }
