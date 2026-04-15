@@ -39,8 +39,11 @@ import StaffDashboard from "./pages/staffs/admin/StaffDashboard.jsx";
 import StaffRegistration from "./pages/staffs/admin/StaffRegistration.jsx"
 import StaffManagement from "./pages/staffs/admin/StaffManagement.jsx";
 import TutorDashboard from "./pages/staffs/tutor/TutorDashboard.jsx";
-import TutorStudentManagement from "./pages/staffs/tutor/TutorStudentManagement.jsx";
 import TutorMasterClass from "./pages/staffs/tutor/TutorMasterClass.jsx";
+import CourseAdvisorDashboard from "./pages/staffs/courseadvisor/CourseAdvisorDashboard.jsx";
+import CourseAdvisorStudentManagement from "./pages/staffs/courseadvisor/CourseAdvisorStudentManagement.jsx";
+import CourseAdvisorGuardianManagement from "./pages/staffs/courseadvisor/CourseAdvisorGuardianManagement.jsx";
+import CourseAdvisorComingSoon from "./pages/staffs/courseadvisor/CourseAdvisorComingSoon.jsx";
 import StaffMasterClassList from "./pages/staffs/admin/StaffMasterClassList.jsx";
 import CoursesManagement from "./pages/staffs/admin/CoursesManagement.jsx";
 import StudentPaymentHistory from "./pages/Students/StudentPaymentDisplay.jsx";
@@ -107,8 +110,13 @@ function App() {
           {/* Staff Routes */}
           <Route path="/staffs/dashboard" element={<StaffDashboard />} />
           <Route path="/staffs/tutor/dashboard" element={<TutorDashboard />} />
-          <Route path="/staffs/tutor/students" element={<TutorStudentManagement />} />
           <Route path="/staffs/tutor/master-class" element={<TutorMasterClass />} />
+          <Route path="/staffs/course-advisor/dashboard" element={<CourseAdvisorDashboard />} />
+          <Route path="/staffs/course-advisor/students" element={<CourseAdvisorStudentManagement />} />
+          <Route path="/staffs/course-advisor/guardians" element={<CourseAdvisorGuardianManagement />} />
+          <Route path="/staffs/course-advisor/calendar" element={<CourseAdvisorComingSoon title="Calendar" />} />
+          <Route path="/staffs/course-advisor/exams" element={<CourseAdvisorComingSoon title="Exams" />} />
+          <Route path="/staffs/course-advisor/settings" element={<CourseAdvisorComingSoon title="Settings" />} />
           <Route path="/staffs/staff-registration" element={<StaffRegistration />} />
           <Route path="/staffs/manage-staffs" element={<StaffManagement />} />
           <Route path="/staffs/master-class" element={<StaffMasterClassList />} />
