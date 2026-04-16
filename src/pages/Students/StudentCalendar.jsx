@@ -15,7 +15,7 @@ export default function StudentCalendar() {
 
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState("week"); // "week" or "day"
+  const [viewMode] = useState("week"); // "week" or "day"
   const [dateOffset, setDateOffset] = useState(0); // number of days from today
   const [selectedSession, setSelectedSession] = useState(null);
   
