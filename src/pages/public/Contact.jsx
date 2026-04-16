@@ -4,11 +4,9 @@ import Map from "../../components/public/Map";
 import image from "../../assets/images/Career.jpg";
 import ContactSection from "../../components/public/ContactSection";
 
-
 const Contact = () => {
   return (
     <>
-
       <Navbar />
 
       {/* Hero */}
@@ -24,20 +22,30 @@ const Contact = () => {
             Contact Us
           </h1>
           <p className="text-white text-sm mt-2 max-w-md">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          </p>
         </div>
       </div>
 
-      {/*Contact*/}
-      <ContactSection showTitle={false} />
+      {/* --- GLOBAL GRADIENT BACKGROUND WRAPPER --- */}
+      <div className="bg-gradient-to-r from-[#09314F] to-[#E83831]">
+        <div className="bg-white pt-10 pb-16 rounded-b-[80px] md:rounded-b-[180px] overflow-hidden">
 
-      {/* Map */}
-      <Map />
+          <ContactSection showTitle={false} />
+
+          {/* Map */}
+          <div className="Container mt-10">
+            <div className="area-wrapper">
+              <Map />
+            </div>
+          </div>
+
+        </div>
+      </div>
 
       <Footer />
-
     </>
-  )
-}
+  );
+};
 
 export default Contact;
