@@ -21,6 +21,7 @@ import { NavLink } from "react-router-dom";
 import { useTheme } from "../../../context/ThemeContext";
 import logo from "../../../assets/images/tutorial_logo.png";
 import collapselogo from "../../../assets/images/TC 1.png";
+import { useStaffAuth } from "../../../context/StaffAuthContext";
 
 const adminMenuItems = [
   { label: "Dashboard", icon: HomeIcon },
@@ -56,6 +57,7 @@ const courseAdvisorMenuItems = [
 
 export default function StaffSidebar({ collapsed, setCollapsed, isOpen, onClose }) {
   const { theme, setTheme } = useTheme();
+  const { logout } = useStaffAuth();
 
   const [staffInfo, setStaffInfo] = useState(null);
   const [staffRole, setStaffRole] = useState("Staff");
@@ -109,10 +111,7 @@ export default function StaffSidebar({ collapsed, setCollapsed, isOpen, onClose 
     : null;
 
   const handleLogout = () => {
-    localStorage.removeItem("staff_token");
-    localStorage.removeItem("staff_info");
-    localStorage.removeItem("staff_role");
-    window.location.href = "/staff/login";
+    logout();
   };
 
   const getMenuItems = () => {
